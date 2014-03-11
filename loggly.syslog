@@ -1,6 +1,6 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides: loggly
+# Provides: loggly.syslog
 # Required-Start:
 # Required-Stop:
 # Default-Start: 1 2 3 4 5
@@ -11,7 +11,7 @@
 . /etc/init.d/functions
 
 sbindir=/sbin
-script=loggly
+script=loggly.syslog
 TOKEN=d5966f4c-d241-4a61-bf59-3e37625372d9	
 LOG=/var/log/messages
 
@@ -24,7 +24,7 @@ case "$1" in
   start)
 	touch $LOCK_FILE
 	wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth d5966f4c-d241-4a61-bf59-3e37625372d9 --account kaplanaws --yes
-	chkconfig loggly off
+	chkconfig logglysyslog off
 	echo "REMEMBER to check on loggly.com"
 	;;
 

@@ -3,14 +3,14 @@ $InputFilePollInterval 10
 $PrivDropToGroup adm    
                 
 # Apache access file:   
-$InputFileName /var/log/apache2/access.log
+ACCESSLOG
 $InputFileTag apache-access: 
 $InputFileStateFile stat-apache-access
 $InputFileSeverity info 
 $InputRunFileMonitor
 
 #Apache Error file:
-$InputFileName $ERRORLOG
+ERRORLOG
 $InputFileTag apache-error:
 $InputFileStateFile stat-apache-error
 $InputFileSeverity error

@@ -1,5 +1,5 @@
 set -xv
-VERSION=0.01
+VERSION=0.02
 JOB="Backup mysql RDS instance and push to S3"
 DATE=`date +%d%m%Y`
 FILE=/media/ephemeral0/kplus_blended_live.mysql.$DATE.bz2
@@ -13,7 +13,7 @@ TO=/kplus/
 REGION=eu-west
 CREDS=/root/creds
 IAM=kplus-rds-backup
-S3CMD=/usr/local/bin/s3cmd
+S3CMD=/usr/bin/s3cmd
 
 # Get our credentials from metadata
 /root/fetchcreds.sh $IAM $CREDS

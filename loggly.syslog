@@ -13,20 +13,78 @@
 sbindir=/sbin
 script=loggly.syslog
 TOKEN=d5966f4c-d241-4a61-bf59-3e37625372d9	
-LOG=/var/log/messages
+#LOG=/var/log/messages
 
 LOCK_FILE="/var/lock/subsys/loggly"
 
 
 rtrn=1
 
+if [ -z $2 ]; then
+	LOG=$3
+	TYPE=$2
+fi
+
+
+function check_install {
+	if [ ! -f /etc/rsyslog.d/22-loggly.conf ]; then
+		service start syslog /var/log/messages	
+	fi
+}
+
+
 case "$1" in
   start)
 	touch $LOCK_FILE
-	wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth $TOKEN --account kaplanaws --yes
-	chkconfig loggly.syslog off
-	logger "Loggly configured for rsyslog"
-	echo "REMEMBER to check on loggly.com"
+	case "$TYPE" in
+		apache)
+			check_install	
+			if [ -z $LOG ]; then
+				echo no file specifed defaulting to /etc/httpd/conf/httpd.conf
+				LOG=/etc/httpd/conf/httpd.conf
+			fi
+			ACCESSLOG=`grep ^CustomLog $LOG`
+			if [ -z $ACCESSLOG ]; then
+				ACCESSLOG=/etc/httpd/logs/access_log
+			fi
+			ERRORLOG=`grep ^ErrorLog $LOG`
+			if [ -z $ERRORLOG ]; then
+				ERRORLOG=/etc/httpd/logs/error_log
+			fi
+			ERRORLOG=`grep ^ErrorLog $LOG`
+			cat > /etc/httpd/conf.d/loggly.conf << EOF
+			
+		;;
+		php)
+		;;
+		*)
+			if [ -z $LOG ]; then
+				echo no file specifed defaulting to configuring rsyslog for /var/log/messages
+			fi
+			wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth $TOKEN --account kaplanaws --yes
+			chkconfig loggly.syslog off
+			logger "Loggly configured for rsyslog"
+			echo "REMEMBER to check on loggly.com"
+		;;
+	;;
+
+  stop)
+	rm $LOCK_FILE
+	;;
+
+			
+		;;
+		php)
+		;;
+		*)
+			if [ -z $LOG ]; then
+				echo no file specifed defaulting to configuring rsyslog for /var/log/messages
+			fi
+			wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth $TOKEN --account kaplanaws --yes
+			chkconfig loggly.syslog off
+			logger "Loggly configured for rsyslog"
+			echo "REMEMBER to check on loggly.com"
+		;;
 	;;
 
   stop)

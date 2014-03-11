@@ -1,0 +1,25 @@
+$ModLoad imfile
+$InputFilePollInterval 10
+$PrivDropToGroup adm    
+                
+# Apache access file:   
+$InputFileName /var/log/apache2/access.log
+$InputFileTag apache-access: 
+$InputFileStateFile stat-apache-access
+$InputFileSeverity info 
+$InputRunFileMonitor
+
+#Apache Error file:
+$InputFileName $ERRORLOG
+$InputFileTag apache-error:
+$InputFileStateFile stat-apache-error
+$InputFileSeverity error
+$InputRunFileMonitor
+
+#Add a tag for apache events
+$template LogglyFormatApache,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% %msgid% [d5966f4c-d241-4a61-bf59-3e37625372d9@41058 tag=\"apache\"] %msg%\n"
+
+if $programname == 'apache-access' then @@logs-01.loggly.com:514;LogglyFormatApache
+if $programname == 'apache-access' then ~
+if $programname == 'apache-error' then @@logs-01.loggly.com:514;LogglyFormatApache
+if $programname == 'apache-error' then ~'

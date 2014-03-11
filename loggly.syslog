@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Copyright (C) 2012 Red Hat, Inc. All rights reserved.
+#
+# This copyrighted material is made available to anyone wishing to use,
+# modify, copy, or redistribute it subject to the terms and conditions
+# of the GNU General Public License v.2.
+#
+# You should have received a copy of the GNU General Public License
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides: loggly
+# Required-Start:
+# Required-Stop:
+# Default-Start: 1 2 3 4 5
+# Default-Stop: 0 6
+# Short-Description: Configures an instance to communicate with loggly
+### END INIT INFO
+
+. /etc/init.d/functions
+
+sbindir=/sbin
+script=loggly
+TOKEN=d5966f4c-d241-4a61-bf59-3e37625372d9	
+LOG=/var/log/messages
+
+LOCK_FILE="/var/lock/subsys/loggly"
+
+
+rtrn=1
+
+case "$1" in
+  start)
+	touch $LOCK_FILE
+	wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth d5966f4c-d241-4a61-bf59-3e37625372d9 --account kaplanaws --yes
+	chkconfig loggly off
+	echo "REMEMBER to check on loggly.com"
+	;;
+
+  stop)
+	rm $LOCK_FILE
+	;;
+
+  status)
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status}"
+	;;
+esac

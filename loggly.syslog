@@ -51,9 +51,8 @@ case "$1" in
 			if [ -z $ERRORLOG ]; then
 				ERRORLOG=/etc/httpd/logs/error_log
 			fi
-			ERRORLOG=`grep ^ErrorLog $LOG`
-			cat > /etc/httpd/conf.d/loggly.conf << EOF
-			
+			curl https://raw.github.com/jadedrazor/scripts/master/apache.loggly | sed "s/ACCESSLOG/\$InputFileName $ACCESSLOG/" | sed "s/ERRORLOG/\$InputFileName $ERRORLOG/" > /etc/httpd/conf.d/loggly.conf
+			echo "Include /etc/httpd/conf.d/loggly.conf" >> $LOG
 		;;
 		php)
 		;;

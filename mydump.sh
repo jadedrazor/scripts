@@ -13,6 +13,7 @@ TO=/kplus/
 REGION=eu-west
 CREDS=/root/creds
 IAM=kplus-rds-backup
+S3CMD=/usr/local/bin/s3cmd
 
 # Get our credentials from metadata
 /root/fetchcreds.sh $IAM $CREDS
@@ -26,7 +27,7 @@ else
 fi
 
 logger "Starting S3 upload of $FILE"
-s3cmd -c $CREDS put $FILE  s3://$BUCKET/$TO
+$S3CMD -c $CREDS put $FILE  s3://$BUCKET/$TO
 if [ $? -gt 0 ]; then
         logger "FAILED: S3 upload"
 else

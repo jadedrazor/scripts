@@ -25,6 +25,7 @@ case "$1" in
 	touch $LOCK_FILE
 	wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth $TOKEN --account kaplanaws --yes
 	chkconfig loggly.syslog off
+	logger "Loggly configured for rsyslog"
 	echo "REMEMBER to check on loggly.com"
 	;;
 

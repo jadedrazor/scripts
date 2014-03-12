@@ -22,6 +22,7 @@ logger "Start mysqldump $FILE"
 mysqldump -u "$USER" -p"$PASSWD" -h "$RDS" $DB | bzip2 > $FILE 
 if [ $? -gt 0 ]; then 
  	logger "FAILED: MYSQL backup"
+	exit 10
 else
 	logger "SUCCESS: MYSQL backup"
 fi
@@ -30,7 +31,10 @@ logger "Starting S3 upload of $FILE"
 aws s3 cp  $FILE  s3://$BUCKET/$TO --region=eu-west-1
 if [ $? -gt 0 ]; then
         logger "FAILED: S3 upload"
+	exit 10
 else
         logger "SUCCESS: S3 upload"
 fi
+
+exit 0
 	

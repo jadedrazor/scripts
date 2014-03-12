@@ -1,4 +1,4 @@
-set -xv
+# set -xv
 VERSION=0.02
 JOB="Backup mysql RDS instance and push to S3"
 DATE=`date +%d%m%Y`
@@ -27,7 +27,7 @@ else
 fi
 
 logger "Starting S3 upload of $FILE"
-aws s3 cp  $FILE  s3://$BUCKET/$TO
+aws s3 cp  $FILE  s3://$BUCKET/$TO --region=eu-west-1
 if [ $? -gt 0 ]; then
         logger "FAILED: S3 upload"
 else

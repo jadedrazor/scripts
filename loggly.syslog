@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xv
 ### BEGIN INIT INFO
 # Provides: loggly.syslog
 # Required-Start:
@@ -16,11 +17,13 @@ TOKEN=d5966f4c-d241-4a61-bf59-3e37625372d9
 #LOG=/var/log/messages
 
 LOCK_FILE="/var/lock/subsys/loggly"
+CMD=$1
+APACHEROOT=/etc/httpd
 
 
 rtrn=1
 
-if [ -z $2 ]; then
+if [ ! -z $2 ]; then
 	LOG=$3
 	TYPE=$2
 fi
@@ -33,47 +36,44 @@ function check_install {
 }
 
 
-case "$1" in
+case "$CMD" in
   start)
 	touch $LOCK_FILE
 	case "$TYPE" in
 		apache)
 			check_install	
 			if [ -z $LOG ]; then
-				echo no file specifed defaulting to /etc/httpd/conf/httpd.conf
 				LOG=/etc/httpd/conf/httpd.conf
+				echo no file specifed defaulting to $LOG
 			fi
-			ACCESSLOG=`grep ^CustomLog $LOG`
+			ACCESSLOG=`grep ^CustomLog $LOG | awk '{ print $2 }'`
 			if [ -z $ACCESSLOG ]; then
-				ACCESSLOG=/etc/httpd/logs/access_log
+				ACCESSLOG=access_log
 			fi
-			ERRORLOG=`grep ^ErrorLog $LOG`
+			ERRORLOG=`grep ^ErrorLog $LOG | awk '{ print $2 }'`
 			if [ -z $ERRORLOG ]; then
-				ERRORLOG=/etc/httpd/logs/error_log
+				ERRORLOG=error_log
 			fi
-			curl https://raw.github.com/jadedrazor/scripts/master/apache.loggly | sed "s/ACCESSLOG/\$InputFileName $ACCESSLOG/" | sed "s/ERRORLOG/\$InputFileName $ERRORLOG/" > /etc/httpd/conf.d/loggly.conf
-			echo "Include /etc/httpd/conf.d/loggly.conf" >> $LOG
-		;;
-		php)
-		;;
-		*)
-			if [ -z $LOG ]; then
-				echo no file specifed defaulting to configuring rsyslog for /var/log/messages
+			if [[ $ACCESSLOG != ^/ ]]; then
+				ACCESSLOG="$APACHEROOT/$ACCESSLOG"
 			fi
-			wget -q -O - https://www.loggly.com/install/configure-syslog.py | sudo python - setup --auth $TOKEN --account kaplanaws --yes
-			chkconfig loggly.syslog off
-			logger "Loggly configured for rsyslog"
-			echo "REMEMBER to check on loggly.com"
-		;;
-	;;
-
-  stop)
-	rm $LOCK_FILE
-	;;
-
+			if [[ $ERRORLOG != ^/ ]]; then
+				ERRORLOG="$APACHEROOT/$ERRORLOG"
+			fi
 			
+			curl https://raw.github.com/jadedrazor/scripts/master/apache.loggly | sed "s@ACCESSLOG@\$InputFileName $ACCESSLOG@" | sed "s@ERRORLOG@\$InputFileName $ERRORLOG@" >> /etc/rsyslog.d/22-loggly.conf
 		;;
 		php)
+                        check_install
+                        if [ -z $LOG ]; then
+                                LOG=`php -i | grep 'Loaded Configuration File' | awk '{ print $NF }'`
+                                echo no config file specifed defaulting to $LOG
+                        fi
+			grep -v ^error_log $LOG > /tmp/php.ini
+			cat /tmp/php.ini > $LOG
+			echo "error_log = syslog" >> $LOG
+			rm /tmp/php.ini
+			service httpd restart
 		;;
 		*)
 			if [ -z $LOG ]; then
@@ -84,13 +84,15 @@ case "$1" in
 			logger "Loggly configured for rsyslog"
 			echo "REMEMBER to check on loggly.com"
 		;;
-	;;
+	esac
+  ;;
 
   stop)
 	rm $LOCK_FILE
 	;;
 
   status)
+	check_install
 	;;
   *)
 	echo $"Usage: $0 {start|stop|status}"

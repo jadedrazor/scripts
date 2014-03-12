@@ -13,10 +13,7 @@ TO=/kplus/
 REGION=eu-west
 CREDS=/root/creds
 IAM=kplus-rds-backup
-S3CMD=/usr/bin/s3cmd
 
-# Get our credentials from metadata
-# /root/fetchcreds.sh $IAM $CREDS
 
 logger "Start mysqldump $FILE"
 mysqldump -u "$USER" -p"$PASSWD" -h "$RDS" $DB | bzip2 > $FILE 

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xv
+# set -xv
 ### BEGIN INIT INFO
 # Provides: loggly.syslog
 # Required-Start:

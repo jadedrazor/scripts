@@ -1,5 +1,5 @@
 # set -xv
-VERSION=0.02
+VERSION=0.03
 JOB="Backup mysql RDS instance and push to S3"
 DATE=`date +%d%m%Y`
 FILE=/media/ephemeral0/kplus_blended_live.mysql.$DATE.bz2
@@ -31,7 +31,7 @@ logger "Starting S3 upload of $FILE"
 aws s3 cp  $FILE  s3://$BUCKET/$TO --region=eu-west-1
 if [ $? -gt 0 ]; then
         logger "FAILED: S3 upload"
-	exit 10
+	exit 11
 else
         logger "SUCCESS: S3 upload"
 fi

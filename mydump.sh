@@ -27,7 +27,7 @@ else
 fi
 
 logger "Starting S3 upload of $FILE"
-$S3CMD -c $CREDS put $FILE  s3://$BUCKET/$TO
+aws s3 cp  $FILE  s3://$BUCKET/$TO
 if [ $? -gt 0 ]; then
         logger "FAILED: S3 upload"
 else

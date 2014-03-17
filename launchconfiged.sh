@@ -31,4 +31,6 @@ echo "Trying to create launch config $LCNAME"
 aws autoscaling create-launch-configuration --launch-configuration-name "$LCNAME" --image-id="$AMI"  --instance-type "$INTTYPE" --user-data  file://"${USERDATA}" --security-groups $SG --key-name $KEY
 
 echo "Trying to create auto-scale group $LCNAME-asg"
-aws autoscaling   create-auto-scaling-group --launch-configuration-name "$LCNAME" --auto-scaling-group-name $LCNAME-asg --min-size $MIN --max-size $MAX --desired-capacity $DESIRED --availability-zones $AVI --vpc-zone-identifier $VPC --load-balancer-names $ELB --tag "project=$PROJECT, p=true" --tag "environment=$ENV, p=true"
+aws autoscaling   create-auto-scaling-group --launch-configuration-name "$LCNAME" --auto-scaling-group-name $LCNAME-asg --min-size $MIN --max-size $MAX --desired-capacity $DESIRED --availability-zones $AVI --vpc-zone-identifier $VPC --load-balancer-names $ELB --tags Key=Project,Value=$PROJECT,PropagateAtLaunch=true Key=Environment,Value=$ENV,PropagateAtLaunch=true Key=CostCentre,Value=$CC,PropagateAtLaunch=true Key=Role,Value=$ROLE,PropagateAtLaunch=true
+
+

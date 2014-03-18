@@ -6,7 +6,7 @@ ROLE=web
 CC=Nathan
 INSTANCEID=$(curl -s 169.254.169.254/latest/meta-data/instance-id)
 MY_IP=$(curl -s 169.254.169.254/latest/meta-data/local-ipv4)
-DOMAINNAME=eltsite.prod.aws.kapintdc.com
+DOMAINNAME=aws.kapintdc.com
 	HOSTNAME=$PROJECT-10245-$ENV-$ROLE-$INSTANCEID
 	hostname $HOSTNAME
 	sed -i "s/HOSTNAME=.*/HOSTNAME=$HOSTNAME/" /etc/sysconfig/network
